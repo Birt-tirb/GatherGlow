@@ -1,4 +1,4 @@
-GatherGlow 0.1.20 for World of Warcraft: Forever 1.60.1
+GatherGlow 0.1.23 for World of Warcraft: Forever 1.60.1
 
 Install
 1. Close WoW: Forever.
@@ -18,6 +18,10 @@ means ready to skin.
 GatherGlow uses WoW's widest Interact Key angle, so the marker can appear on
 targets off to the side. It requests a 60-yard range, and WoW determines
 which nearby target is actually available.
+GatherGlow enables the game's Interact Key nameplate setting while it is on.
+WoW may show its own nameplate for nearby interactable NPCs as well.
+For the amber hide, enable Enemy Unit Nameplate under Esc > Options >
+Gameplay > Nameplates so WoW can provide a corpse nameplate.
 
 Herbs chime and ore plays an anvil strike once per encounter.
 The same node can chime again after it has been out of view for 25 seconds.

@@ -35,7 +35,8 @@ events:SetScript("OnEvent", function(self, event, loadedAddon)
     setting:SetValueChangedCallback(function(_, enabled)
         ApplyEnabled(enabled)
     end)
-    Settings.CreateCheckbox(category, setting, "Show gathering glows and fishing pool pins, and play herb and ore chimes.")
+    Settings.CreateCheckbox(category, setting,
+        "Show gathering markers and fishing pins and play herb and ore chimes. Skinning needs Enemy Unit Nameplate enabled.")
     Settings.RegisterAddOnCategory(category)
 
     self:RegisterEvent("PLAYER_LOGIN")

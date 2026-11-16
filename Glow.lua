@@ -92,7 +92,6 @@ burst:SetScript("OnFinished", function() flash:Hide() end)
 
 local enabled
 local inWorld = true
-local showingCorpsePlate
 local activePlate, activeKind, activeInRange
 local sessionSettings = {}
 
@@ -168,11 +167,39 @@ local function RestoreSettings()
     RestoreSetting(objectRangeSetting)
     RestoreSetting(rangeSetting)
     RestoreSetting(interactSetting)
-    showingCorpsePlate = nil
 end
 
 local function IsKnownTrue(value)
     return not issecretvalue(value) and value == true
+end
+
+local cursorFileKinds = {}
+local function RegisterCursorFile(fileID, kind)
+    if not issecretvalue(fileID) and type(fileID) == "number" and fileID > 0 then
+        cursorFileKinds[fileID] = kind
+    end
+end
+
+-- Native cursor textures can expose a file ID even when no atlas name is readable.
+local cursorNames = {
+    GatherHerbs = "herb",
+    Mine = "ore",
+    Skin = "skinning",
+    SkinAlliance = "skinning",
+    SkinHorde = "skinning",
+}
+for name, kind in pairs(cursorNames) do
+    for _, prefix in ipairs({ "", "Unable" }) do
+        local cursorName = prefix .. name
+        RegisterCursorFile(GetFileIDFromPath("Interface\\Cursor\\" .. cursorName .. ".blp"), kind)
+        local atlasSuffix = cursorName:lower() .. "_32"
+        for _, atlasPrefix in ipairs({ "cursor_", "crosshair_" }) do
+            local info = C_Texture.GetAtlasInfo(atlasPrefix .. atlasSuffix)
+            if info then
+                RegisterCursorFile(info.file, kind)
+            end
+        end
+    end
 end
 
 local function StopFlash()
@@ -180,8 +207,8 @@ local function StopFlash()
     flash:Hide()
 end
 
-local function UpdateGlowRange()
-    local reportedRange = UnitIsInInteractRange(interactUnit)
+local function UpdateGlowRange(unit)
+    local reportedRange = UnitIsInInteractRange(unit)
     local inRange
     if issecretvalue(reportedRange) then
         -- Keep the last readable state so an opaque update cannot re-arm the flash.
@@ -207,7 +234,13 @@ local function UpdateGlowRange()
 end
 
 local function CursorKind(name)
-    if issecretvalue(name) or type(name) ~= "string" then
+    if issecretvalue(name) then
+        return
+    end
+    if type(name) == "number" then
+        return cursorFileKinds[name]
+    end
+    if type(name) ~= "string" then
         return
     end
     name = string.lower(name)
@@ -220,6 +253,18 @@ local function CursorKind(name)
     end
 end
 
+local function ReadCursorKind(texture)
+    return CursorKind(texture:GetAtlas()) or CursorKind(texture:GetTexture())
+        or CursorKind(texture:GetTextureFileID())
+end
+
+local function GetAccessiblePlate(unit)
+    local plate = C_NamePlate.GetNamePlateForUnit(unit)
+    if plate and not plate:IsForbidden() then
+        return plate
+    end
+end
+
 local function GetInteractPlate()
     for _, plate in ipairs(C_NamePlate.GetNamePlates()) do
         if not plate:IsForbidden() then
@@ -229,19 +274,53 @@ local function GetInteractPlate()
             end
         end
     end
+    local plate = GetAccessiblePlate(interactUnit)
+    if plate then
+        return plate, interactUnit
+    end
+end
+
+local function IsCorpse(unit)
+    if IsKnownTrue(UnitIsDead(unit)) then
+        local isPlayer = UnitIsPlayer(unit)
+        return not issecretvalue(isPlayer) and isPlayer == false
+    end
+end
+
+local function HasSkinnableTooltip(unit)
+    local data = C_TooltipInfo.GetUnit(unit)
+    if issecretvalue(data) or not data then
+        return
+    end
+    local lines = data.lines
+    if issecretvalue(lines) or not lines then
+        return
+    end
+    for _, line in ipairs(lines) do
+        if not issecretvalue(line) then
+            local text = line.leftText
+            if not issecretvalue(text) and type(text) == "string" then
+                text = text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
+                if text == UNIT_SKINNABLE_LEATHER or text == UNIT_SKINNABLE then
+                    local guid = UnitGUID(unit)
+                    return issecretvalue(guid) or not guid or not IsKnownTrue(CanLootUnit(guid))
+                end
+            end
+        end
+    end
 end
 
 local function GetKind(plate, unit)
     local unitFrame = plate.UnitFrame
     local icon = unitFrame and unitFrame.SoftTargetFrame and unitFrame.SoftTargetFrame.Icon
-    if icon and not icon:IsForbidden() and icon:IsShown() then
-        local kind = CursorKind(icon:GetAtlas()) or CursorKind(icon:GetTexture())
+    if icon and not icon:IsForbidden() and IsKnownTrue(icon:IsShown()) then
+        local kind = ReadCursorKind(icon)
         if kind then
             return kind
         end
     end
-    if IsKnownTrue(SetUnitCursorTexture(cursor, unit, nil, true, true)) then
-        return CursorKind(cursor:GetAtlas()) or CursorKind(cursor:GetTexture())
+    if IsKnownTrue(SetUnitCursorTexture(cursor, unit, nil, true)) then
+        return ReadCursorKind(cursor)
     end
 end
 
@@ -317,31 +396,30 @@ function addon.RefreshGlow()
         return
     end
 
-    local corpse = false
-    if IsKnownTrue(UnitIsDead(interactUnit)) then
-        local isPlayer = UnitIsPlayer(interactUnit)
-        corpse = not issecretvalue(isPlayer) and isPlayer == false
-    end
-
-    if not InCombatLockdown() and corpse ~= showingCorpsePlate then
-        -- The client needs this setting to expose a plate on the current corpse.
-        -- Only ask for it while the Interact Key is pointing at one.
-        showingCorpsePlate = corpse
-        if corpse then
-            ApplySetting(corpseSetting)
-        else
-            RestoreSetting(corpseSetting)
-        end
-    end
+    local corpse = IsCorpse(interactUnit) == true
 
     local plate, unit = GetInteractPlate()
     if plate then
         local kind = GetKind(plate, unit)
+        if corpse and kind ~= "skinning" and HasSkinnableTooltip(unit) then
+            kind = "skinning"
+        end
         if (kind == "skinning" and corpse)
             or ((kind == "herb" or kind == "ore") and IsKnownTrue(UnitIsGameObject(unit))) then
             ShowGlow(plate, kind)
-            UpdateGlowRange()
+            UpdateGlowRange(interactUnit)
             UpdateGatheringChime(plate, kind, unit)
+            return
+        end
+    end
+
+    -- Use the selected corpse's own visible nameplate when soft targeting
+    -- doesn't supply a gathering marker.
+    if IsCorpse("target") then
+        local targetPlate = GetAccessiblePlate("target")
+        if targetPlate and HasSkinnableTooltip("target") then
+            ShowGlow(targetPlate, "skinning")
+            UpdateGlowRange("target")
             return
         end
     end
@@ -361,6 +439,8 @@ local function Configure()
         ApplySetting(objectRangeSetting)
         ApplySetting(inRangeSetting)
         ApplySetting(arcSetting)
+        -- Enable the native interact plate before WoW picks a corpse.
+        ApplySetting(corpseSetting)
         ApplySetting(interactSetting)
         ApplySetting(objectSetting)
     else
