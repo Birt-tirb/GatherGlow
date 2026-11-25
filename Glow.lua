@@ -1,23 +1,19 @@
-local addonName, addon = ...
+local _, addon = ...
 
 local interactUnit = "softinteract"
 local refreshInterval = 0.15
 local flareTexture = "Interface\\Cooldown\\star4"
-local textureDirectory = "Interface\\AddOns\\" .. addonName .. "\\"
 local glowStyles = {
     herb = {
         color = { 0.30, 1.00, 0.35 },
-        coreTexture = textureDirectory .. "HerbLeaf.tga",
         offset = -12,
     },
     ore = {
         color = { 0.36, 0.84, 1.00 },
-        coreTexture = textureDirectory .. "OreCrystal.tga",
         offset = -12,
     },
     skinning = {
         color = { 1.00, 0.62, 0.17 },
-        coreTexture = textureDirectory .. "SkinningHide.tga",
         offset = -24,
     },
 }
@@ -378,13 +374,13 @@ local function UpdateGatheringChime(plate, kind, unit)
 end
 
 local function ShowGlow(plate, kind)
+    center:SetTexture(addon.GetIconTexture(kind))
     if plate == activePlate and kind == activeKind then
         return
     end
     activePlate, activeKind, activeInRange = plate, kind, nil
     local style = glowStyles[kind]
     halo:SetVertexColor(unpack(style.color))
-    center:SetTexture(style.coreTexture)
     glow:SetParent(plate)
     glow:ClearAllPoints()
     glow:SetPoint("CENTER", plate, "BOTTOM", 0, style.offset)

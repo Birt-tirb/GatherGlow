@@ -1,14 +1,15 @@
 # GatherGlow
 
-GatherGlow highlights nearby gathering targets in **World of Warcraft: Forever 1.60.1**. One switch in **Esc > Options > AddOns > GatherGlow** controls the markers, sounds, and fishing pins.
+GatherGlow highlights nearby gathering targets in **World of Warcraft: Forever 1.60.1**. One switch in **Esc > Options > AddOns > GatherGlow** controls the markers, sounds, and fishing pins. Four dropdowns let you pick built-in icons for herbs, ore, skinning, and fishing pins. Choices are saved and update the displayed icons as you change them.
 
-- A green leaf marks herbs, an icy-blue crystal marks ore, and an amber hide marks corpses ready to skin. The marker pulses as you approach and flashes once when the target comes within Interact Key range.
+- The default icons are a green leaf for herbs, an icy-blue crystal for ore, and an amber hide for corpses ready to skin. The marker pulses as you approach and flashes once when the target comes within Interact Key range.
+- Skinning uses one silent marker on the corpse WoW selects for your Interact Key, with your selected skinnable corpse as a fallback when its nameplate is available.
 - Herbs chime and ore plays an anvil strike once per encounter. During combat the cue waits until WoW can still detect a gathering target after the fight. Skinning is silent.
 - Blue fish on the minimap mark 337 known fishing pool and wreckage locations across 17 established Azeroth zones. Pins indicate saved locations. A pool may be empty when you arrive.
 
 GatherGlow follows the gathering target WoW selects for your Interact Key. It enables the game's Interact Key nameplate setting, which may also show native nameplates on nearby interactable NPCs.
 
-For the amber hide to appear, enable **Enemy Unit Nameplate** under **Esc > Options > Gameplay > Nameplates** so WoW can provide a corpse nameplate.
+For the amber hides to appear, enable **Enemy Unit Nameplate** under **Esc > Options > Gameplay > Nameplates** so WoW can provide corpse nameplates. GatherGlow's options show a setup warning while GatherGlow is enabled and enemy nameplates are off.
 
 ## Install
 

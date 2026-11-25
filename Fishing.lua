@@ -1,8 +1,7 @@
-local addonName, addon = ...
+local _, addon = ...
 
 local UPDATE_INTERVAL = 0.1
 local PIN_SIZE = 14
-local PIN_TEXTURE = "Interface\\AddOns\\" .. addonName .. "\\FishingPoolFish.tga"
 local poolsByContinent
 local overlay, ticker
 local pins = {}
@@ -44,14 +43,13 @@ local function indexPools()
 end
 
 local function getPin(index)
-    if pins[index] then
-        return pins[index]
+    local pin = pins[index]
+    if not pin then
+        pin = overlay:CreateTexture(nil, "OVERLAY")
+        pin:SetSize(PIN_SIZE, PIN_SIZE)
+        pins[index] = pin
     end
-
-    local pin = overlay:CreateTexture(nil, "OVERLAY")
-    pin:SetSize(PIN_SIZE, PIN_SIZE)
-    pin:SetTexture(PIN_TEXTURE)
-    pins[index] = pin
+    pin:SetTexture(addon.GetIconTexture("fishing"))
     return pin
 end
 

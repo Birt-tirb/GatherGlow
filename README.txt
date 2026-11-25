@@ -1,4 +1,4 @@
-GatherGlow 0.1.23 for World of Warcraft: Forever 1.60.1
+GatherGlow 0.1.24 for World of Warcraft: Forever 1.60.1
 
 Install
 1. Close WoW: Forever.
@@ -10,11 +10,17 @@ On or off
 Open Esc > Options > AddOns > GatherGlow and use Enable GatherGlow.
 It starts enabled and remembers your choice. Turn it off before uninstalling
 so it can restore any Interact Key settings it changed.
+Use the four icon dropdowns in the same panel to pick built-in icons for herbs,
+ore, skinning, and fishing pins. Each has the original artwork, a profession icon,
+and a resource icon. Choices are saved and update the displayed icons as you
+change them.
 
 In the world
 A glowing marker shows the nearby gathering target WoW picks for your Interact
-Key. A green leaf means herb, an icy-blue crystal means ore, and an amber hide
-means ready to skin.
+Key. The default icons are a green leaf for herbs, an icy-blue crystal for ore,
+and an amber hide for corpses ready to skin.
+Skinning uses one silent marker on the corpse WoW selects for your Interact Key.
+Your selected skinnable corpse is a fallback when its nameplate is available.
 GatherGlow uses WoW's widest Interact Key angle, so the marker can appear on
 targets off to the side. It requests a 60-yard range, and WoW determines
 which nearby target is actually available.
@@ -22,6 +28,8 @@ GatherGlow enables the game's Interact Key nameplate setting while it is on.
 WoW may show its own nameplate for nearby interactable NPCs as well.
 For the amber hide, enable Enemy Unit Nameplate under Esc > Options >
 Gameplay > Nameplates so WoW can provide a corpse nameplate.
+GatherGlow's options show a setup warning while GatherGlow is enabled and enemy
+nameplates are off. It clears when enemy nameplates are enabled.
 
 Herbs chime and ore plays an anvil strike once per encounter.
 The same node can chime again after it has been out of view for 25 seconds.

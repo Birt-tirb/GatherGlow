@@ -1,10 +1,11 @@
 ## Interface: 16001
 ## Title: GatherGlow
 ## Notes: Gathering glows, herb and ore chimes, and fishing pool pins for WoW: Forever.
-## Version: 0.1.23
+## Version: 0.1.24
 ## SavedVariables: GatherGlowDB
 
 PoolData.lua
+Icons.lua
 Glow.lua
 Fishing.lua
 Core.lua
