@@ -90,6 +90,7 @@ local enabled
 local inWorld = true
 local activePlate, activeKind, activeInRange
 local sessionSettings = {}
+local corpsePlateWanted
 
 local function SavedSettings()
     if not addon.db then
@@ -157,6 +158,7 @@ end
 
 local function RestoreSettings()
     RestoreSetting(corpseSetting)
+    corpsePlateWanted = nil
     RestoreSetting(objectSetting)
     RestoreSetting(arcSetting)
     RestoreSetting(inRangeSetting)
@@ -283,6 +285,22 @@ local function IsCorpse(unit)
     end
 end
 
+local function UpdateCorpsePlate(corpse)
+    if corpsePlateWanted == corpse or InCombatLockdown() then
+        return
+    end
+    if corpse then
+        -- Request the corpse's plate before trying to find its frame.
+        ApplySetting(corpseSetting)
+    else
+        RestoreSetting(corpseSetting)
+        if SavedSettings()[corpseSetting] then
+            return
+        end
+    end
+    corpsePlateWanted = corpse
+end
+
 local function HasSkinnableTooltip(unit)
     local data = C_TooltipInfo.GetUnit(unit)
     if issecretvalue(data) or not data then
@@ -393,6 +411,7 @@ function addon.RefreshGlow()
     end
 
     local corpse = IsCorpse(interactUnit) == true
+    UpdateCorpsePlate(corpse)
 
     local plate, unit = GetInteractPlate()
     if plate then
@@ -429,14 +448,13 @@ local function Configure()
         return
     end
     if enabled then
+        corpsePlateWanted = nil
         -- Ask for earlier detection and WoW's widest targeting angle. The client still
         -- decides how far away each object can be picked as an interact target.
         ApplySetting(rangeSetting)
         ApplySetting(objectRangeSetting)
         ApplySetting(inRangeSetting)
         ApplySetting(arcSetting)
-        -- Enable the native interact plate before WoW picks a corpse.
-        ApplySetting(corpseSetting)
         ApplySetting(interactSetting)
         ApplySetting(objectSetting)
     else
@@ -483,6 +501,7 @@ events:SetScript("OnEvent", function(_, event)
         inWorld = false
         chimeEncounters = {}
         ClearGlow()
+        UpdateCorpsePlate(false)
     elseif event == "PLAYER_ENTERING_WORLD" then
         inWorld = true
         addon.RefreshGlow()
@@ -493,5 +512,8 @@ events:SetScript("OnEvent", function(_, event)
         addon.RefreshGlow()
     else
         ClearGlow()
+        if enabled and inWorld then
+            UpdateCorpsePlate(IsCorpse(interactUnit) == true)
+        end
     end
 end)

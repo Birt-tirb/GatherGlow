@@ -1,4 +1,4 @@
-GatherGlow 0.1.24 for World of Warcraft: Forever 1.60.1
+GatherGlow 0.1.25 for World of Warcraft: Forever 1.60.1
 
 Install
 1. Close WoW: Forever.
@@ -24,8 +24,9 @@ Your selected skinnable corpse is a fallback when its nameplate is available.
 GatherGlow uses WoW's widest Interact Key angle, so the marker can appear on
 targets off to the side. It requests a 60-yard range, and WoW determines
 which nearby target is actually available.
-GatherGlow enables the game's Interact Key nameplate setting while it is on.
-WoW may show its own nameplate for nearby interactable NPCs as well.
+GatherGlow temporarily requests an Interact Key nameplate for a dead creature.
+It restores the previous setting when you move away. Changes wait until combat
+ends when necessary.
 For the amber hide, enable Enemy Unit Nameplate under Esc > Options >
 Gameplay > Nameplates so WoW can provide a corpse nameplate.
 GatherGlow's options show a setup warning while GatherGlow is enabled and enemy

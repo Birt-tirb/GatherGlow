@@ -7,7 +7,7 @@ GatherGlow highlights nearby gathering targets in **World of Warcraft: Forever 1
 - Herbs chime and ore plays an anvil strike once per encounter. During combat the cue waits until WoW can still detect a gathering target after the fight. Skinning is silent.
 - Blue fish on the minimap mark 337 known fishing pool and wreckage locations across 17 established Azeroth zones. Pins indicate saved locations. A pool may be empty when you arrive.
 
-GatherGlow follows the gathering target WoW selects for your Interact Key. It enables the game's Interact Key nameplate setting, which may also show native nameplates on nearby interactable NPCs.
+GatherGlow follows the gathering target WoW selects for your Interact Key. It temporarily requests an Interact Key nameplate for a dead creature and restores the previous setting when you move away. Changes wait until combat ends when necessary.
 
 For the amber hides to appear, enable **Enemy Unit Nameplate** under **Esc > Options > Gameplay > Nameplates** so WoW can provide corpse nameplates. GatherGlow's options show a setup warning while GatherGlow is enabled and enemy nameplates are off.
 
@@ -26,3 +26,12 @@ The four TGA textures ship with the addon. The Python scripts in [tools](tools) 
 GatherGlow's original code, documentation, and artwork are available under the [MIT License](LICENSE).
 
 The fishing locations are adapted from Wuild's GatherLite Forever database. See [the fishing data notice](PoolData-LICENSE.txt) for provenance and the accompanying license notice.
+
+## Changelog
+
+### 0.1.25
+
+- Fixed unwanted interaction nameplates on nearby friendly NPCs.
+- Requests a corpse interaction nameplate only while needed and restores the previous setting when you move away.
+- Nameplate setting changes wait until combat ends when necessary.
+- Skinning remains silent and requires **Enemy Unit Nameplate** to be enabled.
